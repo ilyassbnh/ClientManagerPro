@@ -1,41 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-<html>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
-    <div class="flex items-center justify-center min-h-screen ">
-        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 w-80">
-            <div class="mb-4">
-                <label class="flex items-center border-b border-zinc-300 dark:border-zinc-700 py-2">
-                    <i class="fa-regular fa-user pr-3" style="color: #ffffff;"></i>
-                    <input type="text" placeholder="User name" class="bg-transparent focus:outline-none w-full text-zinc-700 dark:text-zinc-300">
-                </label>
-            </div>
-            <div class="mb-4">
-                <label class="flex items-center border-b border-zinc-300 dark:border-zinc-700 py-2">
-                    <i class="fa-solid fa-g pr-3 " style="color: #ffffff;"></i>
-                    <input type="text" placeholder="Gmail" class="bg-transparent focus:outline-none w-full text-zinc-700 dark:text-zinc-300">
-                </label>
-            </div>
-            <div class="mb-6">
-                <label class="flex items-center border-b border-zinc-300 dark:border-zinc-700 py-2">
-                    <i class="fa-solid fa-lock pr-3" style="color: #ffffff;"></i>
-                    <input type="password" placeholder="Password" class="bg-transparent focus:outline-none w-full text-zinc-700 dark:text-zinc-300">
-                </label>
-            </div>
-            <button class="w-full py-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold">
-                LOGIN
-            </button>
-        </div>4
-    </div>
+<div class="container mt-5">
+    <h2>Sign Up</h2>
+    <?php
+    if (isset($_GET['error'])) {
+        echo '<div class="alert alert-danger" role="alert">' . htmlspecialchars($_GET['error']) . '</div>';
+    }
+    ?>
+    <form action="signup.php" method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="phone" name="phone" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+        <a href="signin.php">sign in</a>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
+<?php
+include '../config.php'; // Ensure the path to config.php is correct
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $password = $_POST['password'];
+
+    // Check if the email is already registered
+    $sql = "SELECT id FROM users WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
+    
+    if ($stmt->num_rows > 0) {
+        // Email already exists
+        header("Location: signup.php?error=Email%20already%20registered");
+        exit();
+    }
+
+    // Insert new user into the database
+    $sql = "INSERT INTO users (name, email, phone_number, password) VALUES (?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssss", $name, $email, $phone, $password);
+    if ($stmt->execute()) {
+        // User registered successfully
+        header("Location: signin.php?message=User%20registered.%20Please%20sign%20in.");
+        exit();
+    } else {
+        // Error inserting user
+        header("Location: signup.php?error=Error%20registering%20user:%20" . $stmt->error);
+        exit();
+    }
+}
+
+$conn->close();
+?>

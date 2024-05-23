@@ -35,10 +35,6 @@ $email = $_SESSION['email'];
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav me-auto">
-                <a class="nav-link active" aria-current="page" href="#">Acceuil</a>
-                <a class="nav-link" href="#">Features</a>
-            </div>
             <div class="navbar-nav">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -47,6 +43,7 @@ $email = $_SESSION['email'];
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="./sign/signin.php">Sign In</a></li>
                         <li><a class="dropdown-item" href="./sign/signup.php">Sign Up</a></li>
+                        <li><a class="dropdown-item" href="./sign/logout.php">log out</a></li>
                     </ul>
                 </li>
             </div>
@@ -57,11 +54,14 @@ $email = $_SESSION['email'];
   <!-- body -->
   <a href="./update/add.php" class="btn btn-success">Ajouter</a>
   <a href="export.php" class="btn btn-secondary">Export as CSV</a>
-  <a href="import.php" class="btn btn-secondary">Import from CSV</a>
+  <form action="import.php" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" required>
+        <button type="submit">Import</button>
+    </form>
   <?php
 include 'config.php';
 
-$sql = "SELECT id, full_name, email, phone_number FROM Clients";
+$sql = "SELECT id, full_name, email, phone_number FROM Clients where userid = $user_id";
 $result = mysqli_query($conn, $sql);
 
 if (mysqli_num_rows($result) > 0) {
