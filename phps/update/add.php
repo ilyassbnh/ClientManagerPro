@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Client</title>
-    <link rel="stylesheet" href="path/to/your/css/file.css">
+    <link rel="stylesheet" href="../styles/update.css">
 </head>
 <body>
     <h1>Add New Client</h1>
